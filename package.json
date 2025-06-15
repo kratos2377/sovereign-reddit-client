@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@privy-io/react-auth": "^2.14.2",
+    "@privy-io/react-auth": "^2.12.0",
+    "@privy-io/server-auth": "1.21.2",
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.98.2",
     "next": "15.3.3",
@@ -27,6 +28,15 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    
+
+    "@tsconfig/next": "^2.0.0",
+    "@tsconfig/node18": "^18.2.0",
+    "@tsconfig/strictest": "^2.0.1",
+    "autoprefixer": "^10.4.7",
+    "dotenv-cli": "^6.0.0",
+    "postcss": "^8.4.14",
+    "ts-node": "^10.9.1"
   }
 }

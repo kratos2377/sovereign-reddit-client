@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FaHome, FaSearch, FaUser, FaSignOutAlt } from 'react-icons/fa'
+import { FaHome, FaSearch, FaUser, FaSignOutAlt, FaPlus } from 'react-icons/fa'
 import { useStore } from '@/store/useStore'
 
 export default function Sidebar() {
@@ -11,8 +11,9 @@ export default function Sidebar() {
 
   const navItems = [
     { href: '/home', label: 'Home', icon: FaHome },
-    { href: '/search', label: 'Search', icon: FaSearch },
-    { href: '/profile', label: 'Profile', icon: FaUser },
+    { href: '/home/search', label: 'Search', icon: FaSearch },
+    { href: '/home/profile', label: 'Profile', icon: FaUser },
+    { href: '/home/create', label: 'Create Post', icon: FaPlus },
     ...(isAuthenticated ? [{ href: '/profile', label: 'Profile', icon: FaUser }] : []),
   ]
 
