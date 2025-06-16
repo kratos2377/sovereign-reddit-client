@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const router = useRouter();
   const { login } = useLogin({
-    onComplete: () => router.push("/home"),
+    onComplete: () => router.push("/create-user"),
   });
 
   return (

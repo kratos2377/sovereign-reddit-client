@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { createUser, chainHash } from '../services/sovereign-api';
+import { createUser, chainHash, createNewUserBankModuleAccount } from '../services/sovereign-api';
 import { BasicSigner } from '../services/signer';
-import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
+import { useSolanaWallets } from '@privy-io/react-auth';
 
 const CreateUserPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {wallets} = useSolanaWallets()
+
+
+  console.log("USER WALLETS ARE")
+  console.log(wallets)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +20,19 @@ const CreateUserPage: React.FC = () => {
 
     try {
       // Convert the private key string to Uint8Array
-      let signer = new BasicSigner(wallets[0].address, chainHash)
+         const encoder = new TextEncoder();
+   const address_uin8array = encoder.encode(wallets[0].address);
+
+
+
+      const signer = await BasicSigner.fromPrivateKeyBytes(address_uin8array, chainHash)
+
+      console.log("CREATING NEW TOKEN BANK AMOUNT")
+      await createNewUserBankModuleAccount(signer);
+
+
+      console.log("CREATING NEW USER")
+
       await createUser(username, signer )
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create user');

@@ -1,10 +1,7 @@
 import { PrivyClient } from "@privy-io/server-auth";
-import Image from "next/image";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Login from "@/components/Login";
-import {useSolanaWallets} from '@privy-io/react-auth/solana';
-
 
 export default async function Home() {
   const cookieStore = await cookies()
@@ -29,7 +26,7 @@ export default async function Home() {
       const claims = await client.verifyAuthToken(cookieAuthToken);
       console.log({ claims });
       //router.replace("/home")
-      redirect("/home");
+      redirect("/create-user");
     } catch (error) {
       console.error(error);
     }
