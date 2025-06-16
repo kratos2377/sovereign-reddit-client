@@ -1,13 +1,26 @@
 'use client'
-
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
 import { FaHome, FaSearch, FaUser, FaSignOutAlt, FaPlus } from 'react-icons/fa'
 import { useStore } from '@/store/useStore'
+import { usePrivy } from '@privy-io/react-auth'
 
 export default function Sidebar() {
   const pathname = usePathname()
   const { isAuthenticated, logout } = useStore()
+ const { logout: WalletLogout} = usePrivy()
+ // const cookieStore = await cookies()
+
+  const logoutOfSovereign = async () => {
+    await WalletLogout()
+ //   cookieStore.delete('privy-token')
+    logout()
+
+    setTimeout(() => {
+      redirect('/')
+    } , 1000)
+  }
+
 
   const navItems = [
     { href: '/home', label: 'Home', icon: FaHome },
@@ -42,7 +55,7 @@ export default function Sidebar() {
       {true && (
         <div className="p-4 border-t border-gray-700 hover:cursor-pointer">
           <button
-            onClick={logout}
+            onClick={logoutOfSovereign}
             className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
           >
             <FaSignOutAlt className="w-5 h-5" />

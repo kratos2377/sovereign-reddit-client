@@ -1,6 +1,7 @@
 import { createStandardRollup } from "@sovereign-sdk/web3";
 import { type RuntimeCall } from "./types";
 import { BasicSigner } from "./signer";
+import { Wallet } from "@privy-io/react-auth";
 
 const rollup = await createStandardRollup({
   context: {
@@ -16,7 +17,8 @@ const rollup = await createStandardRollup({
 export const chainHash = rollup.serializer.schema.chainHash;
 
 
-export const createUser = async (username: string , signer: BasicSigner ) => {
+
+export const createUser = async (username: string , signer: BasicSigner) => {
  const create_user_transaction: RuntimeCall = {
   reddit_module: {
     create_user: {
@@ -25,7 +27,8 @@ export const createUser = async (username: string , signer: BasicSigner ) => {
   },
 };
 
-    
+
+
     await rollup.call(create_user_transaction, { signer }); 
 
 }

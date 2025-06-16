@@ -2,14 +2,21 @@
 
 import { useEffect } from 'react'
 import { useStore } from '@/store/useStore'
-import { useSolanaWallets } from '@privy-io/react-auth'
+import { getAccessToken, usePrivy, useSolanaWallets } from "@privy-io/react-auth";
+import { BasicSigner } from '@/services/signer';
+import { chainHash } from '@/services/sovereign-api';
+import Link from 'next/link';
 
 export default function HomePage() {
   const { posts, setPosts } = useStore()
 
+
+
   useEffect(() => {
     // Here you would typically fetch posts from your API
     // For now, we'll use dummy data
+
+
     const dummyPosts = [
       {
         post_sov_id: '1',
@@ -18,6 +25,9 @@ export default function HomePage() {
         user_sov_id: 'user1',
         upvotes: 42,
         comments: 5,
+        downvotes: 0,
+        score: 42,
+        updatedAt: new Date().toISOString(),
         createdAt: new Date().toISOString(),
       },
       {
@@ -26,6 +36,9 @@ export default function HomePage() {
         content: 'Another interesting post with some content that users might find engaging.',
         user_sov_id: 'user2',
         upvotes: 28,
+        downvotes: 0,
+        score: 28,
+        updatedAt: new Date().toISOString(),
         comments: 3,
         createdAt: new Date().toISOString(),
       },
@@ -36,7 +49,15 @@ export default function HomePage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Home Feed</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Home Feed</h1>
+        <Link 
+          href="/create-user" 
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+        >
+          Create User
+        </Link>
+      </div>
       <div className="space-y-4">
         {posts.map((post) => (
           <div
