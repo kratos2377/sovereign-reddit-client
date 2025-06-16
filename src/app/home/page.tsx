@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useStore } from '@/store/useStore'
+import { useSolanaWallets } from '@privy-io/react-auth'
 
 export default function HomePage() {
   const { posts, setPosts } = useStore()
@@ -11,19 +12,19 @@ export default function HomePage() {
     // For now, we'll use dummy data
     const dummyPosts = [
       {
-        id: '1',
+        post_sov_id: '1',
         title: 'First Post',
         content: 'This is the content of the first post. It can be a longer text that describes what the post is about.',
-        author: 'user1',
+        user_sov_id: 'user1',
         upvotes: 42,
         comments: 5,
         createdAt: new Date().toISOString(),
       },
       {
-        id: '2',
+        post_sov_id: '2',
         title: 'Second Post',
         content: 'Another interesting post with some content that users might find engaging.',
-        author: 'user2',
+        user_sov_id: 'user2',
         upvotes: 28,
         comments: 3,
         createdAt: new Date().toISOString(),
@@ -32,17 +33,18 @@ export default function HomePage() {
     setPosts(dummyPosts)
   }, [setPosts])
 
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Home Feed</h1>
       <div className="space-y-4">
         {posts.map((post) => (
           <div
-            key={post.id}
+            key={post.post_sov_id}
             className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-gray-500">Posted by {post.author}</span>
+              <span className="text-sm text-gray-500">Posted by {post.user_sov_id}</span>
               <span className="text-sm text-gray-500">•</span>
               <span className="text-sm text-gray-500">
                 {new Date(post.createdAt).toLocaleDateString()}
