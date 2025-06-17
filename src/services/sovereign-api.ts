@@ -18,7 +18,7 @@ export const chainHash = rollup.serializer.schema.chainHash;
 export const createNewUserBankModuleAccount = async (signer: BasicSigner) => {
 
   console.log("MINT ADDRESS IS")
-  console.log((await signer.publicKey()).toString())
+  console.log((await signer.publicKey()))
 
   const createTokenCall: RuntimeCall = {
   bank: {
