@@ -21,6 +21,7 @@ export default async function Home() {
     const PRIVY_APP_ID = "cmbxw3sa300msl50mealj8znh";
     const PRIVY_APP_SECRET = "5uc73p6yZ6fuVn6EQUAvVBgbDnYws1XYUAr4trRccVoKSMqNNNNTfkqQBqKPEZcPRauVchgeRPiRUj91siwRJedc";
     const client = new PrivyClient(PRIVY_APP_ID!, PRIVY_APP_SECRET!);
+ 
 
     try {
       const claims = await client.verifyAuthToken(cookieAuthToken);
