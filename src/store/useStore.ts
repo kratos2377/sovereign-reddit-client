@@ -4,6 +4,8 @@ import { apiService } from '../services/api'
 interface User {
   sov_id: string
   username: string
+  privateKey?: Uint8Array
+  publicKey?: string
 }
 
 interface Post {
@@ -74,6 +76,7 @@ interface AppState {
   userSubs: UserJoinedSubs[]
   isAuthenticated: boolean
   setUser: (user: User | null) => void
+  setUserCredentials: (username: string, privateKey: Uint8Array, publicKey: string) => void
   setPosts: (posts: Post[]) => void
   setComments: (comments: Comment[]) => void
   setUserSubs: (subs: UserJoinedSubs[]) => void
@@ -98,6 +101,9 @@ export const useStore = create<AppState>((set) => ({
   isAuthenticated: false,
   
   setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setUserCredentials: (username, privateKey, publicKey) => set((state) => ({
+    user: state.user ? { ...state.user, username, privateKey, publicKey } : null
+  })),
   setPosts: (posts) => set({ posts }),
   setComments: (comments) => set({ comments }),
   setUserSubs: (userSubs) => set({ userSubs }),

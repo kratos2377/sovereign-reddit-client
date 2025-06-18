@@ -1,7 +1,7 @@
-import { createStandardRollup } from "@sovereign-sdk/web3";
+import { addressFromPublicKey, createStandardRollup } from "@sovereign-sdk/web3";
 import { type RuntimeCall } from "./types";
 import { BasicSigner } from "./signer";
-
+import * as ed25519 from "@noble/ed25519";
 const rollup = await createStandardRollup({
   context: {
     defaultTxDetails: {
@@ -17,20 +17,18 @@ export const chainHash = rollup.serializer.schema.chainHash;
 
 export const createNewUserBankModuleAccount = async (signer: BasicSigner) => {
 
-  console.log("MINT ADDRESS IS")
-  console.log((await signer.publicKey()))
+
+  const signer_pub_address = ed25519.etc.bytesToHex(await signer.publicKey()).replace(/^0x/, "");
+
 
   const createTokenCall: RuntimeCall = {
   bank: {
-    create_token: {
-      admins: [
-        (await signer.publicKey()).toString()
-      ],
-      token_decimals: 8,
-      supply_cap: 100000000000,
-      token_name: "sov-reddit-token",
-      initial_balance: 1000000000,
-      mint_to_address: (await signer.publicKey()).toString(),
+    mint: {
+      coins: {
+        amount: 1000000,
+        token_id: "token_1nyl0e0yweragfsatygt24zmd8jrr2vqtvdfptzjhxkguz2xxx3vs0y07u7"
+      },
+      mint_to_address: addressFromPublicKey(signer_pub_address , "sov")
     },
   },
 };
