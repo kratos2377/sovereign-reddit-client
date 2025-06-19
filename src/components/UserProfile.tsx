@@ -15,6 +15,7 @@ import { useStore } from '../store/useStore';
 import { LoadingModal } from './LoadingModal';
 import { useApiCall } from '../hooks/useApiCall';
 import { PostVoting } from './PostVoting';
+import { useRouter } from 'next/navigation';
 
 interface UserProfileProps {
   user_sov_id: string;
@@ -24,6 +25,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user_sov_id }) => {
   const { user, posts, comments, getUserPosts, getUserComments } = useStore();
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
+  const router = useRouter();
 
   const { execute: fetchUserData } = useApiCall(
     async () => {
@@ -48,6 +50,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user_sov_id }) => {
 
   const handleTabChange = (index: number) => {
     setActiveTab(index);
+  };
+
+  const handlePostClick = (postId: string) => {
+    router.push(`/home/post/${postId}`);
   };
 
   return (
@@ -79,6 +85,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user_sov_id }) => {
                       borderWidth={1}
                       borderRadius="md"
                       boxShadow="sm"
+                      cursor="pointer"
+                      _hover={{ boxShadow: "md" }}
+                      transition="box-shadow 0.2s"
+                      onClick={() => handlePostClick(post.post_sov_id)}
                     >
                       <Heading size="md" mb={2}>
                         {post.title}

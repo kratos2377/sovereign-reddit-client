@@ -5,10 +5,13 @@ import { usePrivy, useSolanaWallets, useLogin } from "@privy-io/react-auth";
 import { apiService } from "@/services/api";
 import { BasicSigner } from "@/services/signer";
 import { chainHash, getCreateUserTransaction, submitTransactionToRollup } from "@/services/sovereign-api";
+import { useStore } from "@/store/useStore";
+import { LoadingModal } from "@/components/LoadingModal";
 
 
 export default function Home() {
   const router = useRouter();
+  const setUser = useStore((state) => state.setUser);
 
   const [loading, setLoading] = useState(true);
   const { ready, authenticated } = usePrivy();
@@ -28,6 +31,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [showUsernameForm, setShowUsernameForm] = useState(false);
   const [walletChecked, setWalletChecked] = useState(false);
+  const [verifyingUser, setVerifyingUser] = useState(false);
+  const [verifyingMessage, setVerifyingMessage] = useState("");
 
 
   useEffect(() => {
@@ -37,17 +42,13 @@ export default function Home() {
       
 
 
-      if (authenticated) {
-       console.log("AUTHENTICATED. SO THIS FLOW IS FOLLOWED")
-      
+      if (authenticated) {      
           try {
             // const claims = await client.verifyAuthToken(cookieAuthToken);
             // console.log({ claims });
             //router.replace("/home")
            // redirect("/home");
-           console.log("CHECKING USER ACCOUNT")
            checkUserAccount().then(() => {
-            console.log("USER ACCOUNT CHECKED")
             setLoading(false);
            })
           } catch (error) {
@@ -60,7 +61,6 @@ export default function Home() {
 
 
       } else {
-        console.log("NOT AUTHENTICATED. SO THIS FLOW IS FOLLOWED")
         setLoading(false);
       } 
 
@@ -88,9 +88,17 @@ export default function Home() {
 
 
       if (user.data.models !== null && user.data.models !== undefined  && user.data.models.length > 0) {
-        router.replace("/home");
+        setUser({
+          sov_id: user.data.models[0].sov_id,
+          username: user.data.models[0].username
+        });
+
+        setTimeout(() => {
+          router.replace("/home");
+        } , 200)
       } else {
         setShowUsernameForm(true);
+        setUser(null);
       }
       setWalletChecked(true);
     }, 2000); //
@@ -134,15 +142,48 @@ export default function Home() {
           return;
         }
 
-        // Call your createUser logic here (assume createUser exists)
-        // await createUser(username, signer);
-        // After registration, redirect
         const signer = await BasicSigner.fromPrivateKeyBytes(Uint8Array.from(wallets[0].address) , chainHash)
         const user_create_transaction = await getCreateUserTransaction(username);
   
-          await submitTransactionToRollup(user_create_transaction, signer)
-        router.push("/home");
+        await submitTransactionToRollup(user_create_transaction, signer)
+        setVerifyingUser(true);
+        setVerifyingMessage("Transaction Submitted. Verifying User...");
+        // Try to fetch user up to 3 times, increasing wait by 5s each time
+        let found = false;
+        let attempt = 0;
+        let wait = 5000;
+        const bs58Key = await signer.getBs58Key();
+        while (attempt < 3 && !found) {
+          await new Promise((res) => setTimeout(res, wait));
+          try {
+            const user = await apiService.fetchModel({ schema: "user", primaryKey: bs58Key });
+            if (user.data.models && user.data.models.length > 0) {
+              setUser({
+                sov_id: user.data.models[0].sov_id,
+                username: user.data.models[0].username
+              });
+              setTimeout(() => {
+                setVerifyingUser(false);
+                router.replace("/home");
+              }, 200);
+              found = true;
+              break;
+            }
+          } catch (err) {
+            // ignore, will retry
+          }
+          attempt++;
+          wait += 5000;
+        }
+        if (!found) {
+          setVerifyingUser(false);
+          setError("Registration succeeded but user not found after transaction. Please refresh or try again.");
+        } else {
+          setVerifyingUser(false);
+          router.replace("/home");
+        }
       } catch (err) {
+        setVerifyingUser(false);
         setError("Registration failed: " + (err instanceof Error ? err.message : "Unknown error"));
       }
     };
@@ -150,6 +191,7 @@ export default function Home() {
 
   return  (
     <main className="flex min-h-screen min-w-full">
+      <LoadingModal isOpen={verifyingUser} message={verifyingMessage} />
       {/* Left: SVG and App Title */}
       <div className="w-1/2 flex flex-col items-center justify-center bg-indigo-600 p-8">
         <svg

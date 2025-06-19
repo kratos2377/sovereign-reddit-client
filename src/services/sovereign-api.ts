@@ -49,27 +49,41 @@ export const getCreateUserTransaction = async (username: string) => {
     },
   };
 
-
-
-
   return create_user_transaction;
 }
 
-export const createUser = async (username: string , signer: BasicSigner) => {
- const create_user_transaction: RuntimeCall = {
-  reddit_module: {
-    create_user: {
-      username: username
+
+export const getCreateSubredditTransaction = async (subreddit_name: string, description: string, user_address: string) => {
+  const create_subreddit_transaction: RuntimeCall = {
+    reddit_module: {
+      create_sub_reddit: {
+        description:  description,
+        subname:      subreddit_name,
+        user_address: user_address,
+      },
     },
-  },
-};
+  };
 
-
-
-
-    await rollup.call(create_user_transaction, { signer }); 
-
+  return create_subreddit_transaction;
 }
+
+
+export const getCreatePostTransaction = async (content: string, flair: string, subaddress: string, title: string) => {
+  const create_post_transaction: RuntimeCall = {
+    reddit_module: {
+      create_post: {
+        content: content,
+        flair: flair,
+        subaddress: subaddress,
+        title: title
+      },
+    },
+  };
+
+  return create_post_transaction;
+}
+
+
 
 export const submitTransactionToRollup = async ( runtime_call: RuntimeCall , signer: BasicSigner) => {
 

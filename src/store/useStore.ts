@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { apiService } from '../services/api'
 
-interface User {
+export interface User {
   sov_id: string
   username: string
 }
 
-interface Post {
+export interface Post {
   post_sov_id: string
   title: string
   content: string
@@ -19,7 +19,7 @@ interface Post {
   updatedAt: string
 }
 
-interface SubMods {
+export interface SubMods {
   id: string,
   user_sov_id: string,
   sub_sov_id: string,
@@ -28,7 +28,7 @@ interface SubMods {
   updatedAt: string
 }
 
-interface Subreddit {
+export interface Subreddit {
   sub_sov_id: string,
   subname: string,
   createdAt: string
@@ -36,7 +36,7 @@ interface Subreddit {
   sub_description: string,
 }
 
-interface Comment {
+export interface Comment {
   id: string,
   post_sov_id: string,
   user_sov_id: string,
@@ -48,7 +48,7 @@ interface Comment {
   downvote: number,
 }
 
-interface UserJoinedSubs {
+export interface UserJoinedSubs {
   id: string,
   user_sov_id: string,
   sub_sov_id: string,
@@ -56,7 +56,7 @@ interface UserJoinedSubs {
   updated_at: string,
 }
 
-interface UserLikedPosts { 
+export interface UserLikedPosts { 
 
    id: string,
    user_sov_id: string,
@@ -67,7 +67,7 @@ interface UserLikedPosts {
 
 }
 
-interface AppState {
+export interface AppState {
   user: User | null
   posts: Post[]
   comments: Comment[]
@@ -78,6 +78,7 @@ interface AppState {
   setComments: (comments: Comment[]) => void
   setUserSubs: (subs: UserJoinedSubs[]) => void
   logout: () => void
+  resetAllStates: () => void
   // API actions
   fetchUserSubs: (user_sov_id: string) => Promise<void>
   joinOrUnjoinSub: (user_sov_id: string, sub_sov_id: string) => Promise<void>
@@ -102,6 +103,13 @@ export const useStore = create<AppState>((set) => ({
   setComments: (comments) => set({ comments }),
   setUserSubs: (userSubs) => set({ userSubs }),
   logout: () => set({ user: null, isAuthenticated: false }),
+  resetAllStates: () => set({ 
+    user: null, 
+    posts: [], 
+    comments: [], 
+    userSubs: [], 
+    isAuthenticated: false 
+  }),
 
   // API actions
   fetchUserSubs: async (user_sov_id) => {

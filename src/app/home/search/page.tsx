@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
+import { useRouter } from 'next/navigation'
 
 interface Subreddit {
   id: string
@@ -13,6 +14,7 @@ interface Subreddit {
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Subreddit[]>([])
+  const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,6 +37,10 @@ export default function SearchPage() {
     setSearchResults(dummyResults)
   }
 
+  const handleSubredditClick = (subredditId: string) => {
+    router.push(`/home/sub/${subredditId}`);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <form onSubmit={handleSearch} className="mb-8">
@@ -54,7 +60,8 @@ export default function SearchPage() {
         {searchResults.map((subreddit) => (
           <div
             key={subreddit.id}
-            className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
+            className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => handleSubredditClick(subreddit.id)}
           >
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-xl font-semibold">{subreddit.name}</h2>
