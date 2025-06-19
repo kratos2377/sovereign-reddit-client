@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { createUser, chainHash, getCreateUserTransaction, sumitTransactionToRollup } from '../services/sovereign-api';
+import { createUser, chainHash, getCreateUserTransaction,   submitTransactionToRollup, serializeRuntimeCall } from '../services/sovereign-api';
 import { BasicSigner } from '../services/signer';
-import { useSendTransaction, useSolanaWallets } from '@privy-io/react-auth';
-
-
+import {useSolanaWallets, useSignMessage} from '@privy-io/react-auth/solana';
+import bs58 from 'bs58';
+import { addressFromPublicKey } from '@sovereign-sdk/web3';
 const CreateUserPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {wallets} = useSolanaWallets()
-  const { sendTransaction } = useSendTransaction();
+
+  const { signMessage } = useSignMessage()
 
   console.log("USER WALLETS ARE")
   console.log(wallets)
@@ -26,18 +27,37 @@ const CreateUserPage: React.FC = () => {
 
 // ser
 //       const signer = await BasicSigner.fromPrivateKeyBytes(address_uin8array, chainHash)
+      console.log("WALLET ADDRESS IS")
+      console.log(wallets[0].address)
 
-  
 
+
+      // console.log("SOV ADDRESS IS")
+      // console.log(sov_address)
+      const encoded_address = bs58.encode(Uint8Array.from(wallets[0].address))
+      console.log("ENCODED ADDRESS IS")
+      console.log(encoded_address)
       // console.log("CREATING NEW TOKEN BANK AMOUNT")
       // await createNewUserBankModuleAccount(signer);
 
-      const user_create_transaction = await getCreateUserTransaction(username);
-      
       console.log("CREATING NEW USER")
+      const user_create_transaction = await getCreateUserTransaction(username);
+      // const user_create_transaction_bytes = await serializeRuntimeCall(user_create_transaction);
 
-      await sumitTransactionToRollup(user_create_transaction)
+
+      // const signature = bs58.encode(user_create_transaction_bytes);
+
+      // // console.log("SIGNED IX IS")
+      // //console.log(signedTransaction)
+
+
+      // console.log("SINATURE IS")
+      // console.log(signature)
+      const signer = await BasicSigner.fromPrivateKeyBytes(Uint8Array.from(wallets[0].address), chainHash)
+
+        await submitTransactionToRollup(user_create_transaction, signer)
     } catch (err) {
+      console.log("SOME ERROR OCCURED FOR SURE")
       setError(err instanceof Error ? err.message : 'Failed to create user');
     } finally {
       setIsLoading(false);

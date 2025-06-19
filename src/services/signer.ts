@@ -1,6 +1,8 @@
 import * as ed25519 from "@noble/ed25519";
  import { Signer } from "@sovereign-sdk/signers";
+ import bs58 from "bs58";
 
+ 
  export class BasicSigner implements Signer {
    private privateKey: string;
    private chainHash: Uint8Array;
@@ -19,6 +21,10 @@ import * as ed25519 from "@noble/ed25519";
 
    async publicKey() {
      return ed25519.getPublicKeyAsync(this.privateKey);
+   }
+
+   async getBs58Key() {
+    return bs58.encode( await this.publicKey() );
    }
 
    // Constructs a BasicSigner from a private key and a chain hash

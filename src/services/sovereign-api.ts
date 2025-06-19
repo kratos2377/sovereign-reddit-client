@@ -1,8 +1,6 @@
-import { addressFromPublicKey, createStandardRollup, standardTypeBuilder } from "@sovereign-sdk/web3";
+import { createStandardRollup } from "@sovereign-sdk/web3";
 import { type RuntimeCall } from "./types";
 import { BasicSigner } from "./signer";
-import { Transaction } from "@solana/web3.js";
-
 const rollup = await createStandardRollup({
   context: {
     defaultTxDetails: {
@@ -52,23 +50,9 @@ export const getCreateUserTransaction = async (username: string) => {
   };
 
 
-  const result = await standardTypeBuilder().transaction({
-    sender: new Uint8Array([4, 5, 6]),
-    signature: new Uint8Array([4, 5, 6]),
-    rollup: rollup,
-    unsignedTx: {
-      runtime_call: create_user_transaction,
-      generation: Date.now(),
-      details: {
-        max_priority_fee_bips: 100,
-        max_fee: "10000",
-        gas_limit: null,
-        chain_id: 4321
-      }
-    }
-  })
 
-  return rollup.submitTransaction(result);
+
+  return create_user_transaction;
 }
 
 export const createUser = async (username: string , signer: BasicSigner) => {
@@ -87,9 +71,8 @@ export const createUser = async (username: string , signer: BasicSigner) => {
 
 }
 
+export const submitTransactionToRollup = async ( runtime_call: RuntimeCall , signer: BasicSigner) => {
 
-export const sumitTransactionToRollup = async (message: Uint8Array) => {
-
-     await rollup.submitTransaction(message);
+     await rollup.call(runtime_call, { signer });
  
  }
