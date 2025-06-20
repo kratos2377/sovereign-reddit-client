@@ -43,6 +43,10 @@ export interface PostCommentsParams {
   post_sov_id: string;
 }
 
+export interface SearchSubredditsByNameParams {
+  name: string;
+}
+
 export const apiService = {
   // Fetch model by primary key
   fetchModel: async ({ schema, primaryKey }: FetchModelParams) => {
@@ -101,6 +105,12 @@ export const apiService = {
   // Get user subreddits
   getUserSubs: async (user_sov_id: string) => {
     const response = await api.get(`/get_user_subs/${user_sov_id}`);
+    return response.data;
+  },
+
+  // Search subreddits by name
+  searchSubredditsByName: async (params: SearchSubredditsByNameParams) => {
+    const response = await api.post('/search_subreddits_by_name', params);
     return response.data;
   },
 }; 
