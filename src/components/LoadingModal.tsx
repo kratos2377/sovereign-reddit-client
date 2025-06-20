@@ -1,5 +1,4 @@
 import React from 'react';
-import { Modal, Spinner, Text, VStack } from '@chakra-ui/react';
 
 interface LoadingModalProps {
   isOpen: boolean;
@@ -7,24 +6,16 @@ interface LoadingModalProps {
 }
 
 export const LoadingModal: React.FC<LoadingModalProps> = ({ isOpen, message }) => {
+  if (!isOpen) return null;
+
   return (
-    <Modal isOpen={isOpen} onClose={() => {}} closeOnOverlayClick={false}>
-      <VStack
-        position="fixed"
-        top="50%"
-        left="50%"
-        transform="translate(-50%, -50%)"
-        bg="white"
-        p={6}
-        borderRadius="md"
-        boxShadow="lg"
-        spacing={4}
-      >
-        <Spinner size="xl" color="blue.500" />
-        <Text fontSize="lg" fontWeight="medium">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center space-y-4 min-w-[300px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
           {message}
-        </Text>
-      </VStack>
-    </Modal>
+        </p>
+      </div>
+    </div>
   );
 }; 

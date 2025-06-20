@@ -1,16 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Container,
-  Heading,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
 import { useStore } from '../store/useStore';
 import { LoadingModal } from './LoadingModal';
 import { useApiCall } from '../hooks/useApiCall';
@@ -22,7 +10,7 @@ interface UserProfileProps {
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ user_sov_id }) => {
-  const { user, posts, comments, getUserPosts, getUserComments } = useStore();
+  const { posts, comments, getUserPosts, getUserComments } = useStore();
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const router = useRouter();
@@ -57,84 +45,103 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user_sov_id }) => {
   };
 
   return (
-    <Container maxW="container.lg" py={8}>
-      <VStack spacing={8} align="stretch">
-        <Box>
-          <Heading size="lg" mb={2}>
+    <div className="max-w-6xl mx-auto py-8 px-4">
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
             User Profile
-          </Heading>
-          <Text color="gray.500">User ID: {user_sov_id}</Text>
-        </Box>
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">User ID: {user_sov_id}</p>
+        </div>
 
-        <Tabs onChange={handleTabChange}>
-          <TabList>
-            <Tab>Posts</Tab>
-            <Tab>Comments</Tab>
-          </TabList>
+        <div>
+          <div className="border-b border-gray-200 dark:border-gray-700">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => handleTabChange(0)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 0
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                Posts
+              </button>
+              <button
+                onClick={() => handleTabChange(1)}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 1
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                Comments
+              </button>
+            </nav>
+          </div>
 
-          <TabPanels>
-            <TabPanel>
-              {isLoading ? (
-                <LoadingModal isOpen={true} message="Loading posts..." />
-              ) : (
-                <VStack spacing={4} align="stretch">
-                  {posts.map((post) => (
-                    <Box
-                      key={post.post_sov_id}
-                      p={4}
-                      borderWidth={1}
-                      borderRadius="md"
-                      boxShadow="sm"
-                      cursor="pointer"
-                      _hover={{ boxShadow: "md" }}
-                      transition="box-shadow 0.2s"
-                      onClick={() => handlePostClick(post.post_sov_id)}
-                    >
-                      <Heading size="md" mb={2}>
-                        {post.title}
-                      </Heading>
-                      <Text mb={4}>{post.content}</Text>
-                      <PostVoting
-                        post_sov_id={post.post_sov_id}
-                        score={post.score}
-                      />
-                    </Box>
-                  ))}
-                  {posts.length === 0 && (
-                    <Text color="gray.500">No posts yet</Text>
-                  )}
-                </VStack>
-              )}
-            </TabPanel>
+          <div className="mt-6">
+            {activeTab === 0 && (
+              <div>
+                {isLoading ? (
+                  <LoadingModal isOpen={true} message="Loading posts..." />
+                ) : (
+                  <div className="space-y-4">
+                    {posts.map((post) => (
+                      <div
+                        key={post.post_sov_id}
+                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800 cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => handlePostClick(post.post_sov_id)}
+                      >
+                        <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                          {post.title}
+                        </h3>
+                        <p className="mb-4 text-gray-700 dark:text-gray-300">{post.content}</p>
+                        <PostVoting
+                          post_sov_id={post.post_sov_id}
+                          score={post.score}
+                        />
+                      </div>
+                    ))}
+                    {posts.length === 0 && (
+                      <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                        No posts yet
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
-            <TabPanel>
-              {isLoading ? (
-                <LoadingModal isOpen={true} message="Loading comments..." />
-              ) : (
-                <VStack spacing={4} align="stretch">
-                  {comments.map((comment) => (
-                    <Box
-                      key={comment.id}
-                      p={4}
-                      borderWidth={1}
-                      borderRadius="md"
-                      boxShadow="sm"
-                    >
-                      <Text mb={2}>{comment.content}</Text>
-                      <Text fontSize="sm" color="gray.500">
-                        Score: {comment.score}
-                      </Text>
-                    </Box>
-                  ))}
-                  {comments.length === 0 && (
-                    <Text color="gray.500">No comments yet</Text>
-                  )}
-                </VStack>
-              )}
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </VStack>
-    </Container>
+            {activeTab === 1 && (
+              <div>
+                {isLoading ? (
+                  <LoadingModal isOpen={true} message="Loading comments..." />
+                ) : (
+                  <div className="space-y-4">
+                    {comments.map((comment) => (
+                      <div
+                        key={comment.id}
+                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800"
+                      >
+                        <p className="mb-2 text-gray-900 dark:text-gray-100">{comment.content}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Score: {comment.score}
+                        </p>
+                      </div>
+                    ))}
+                    {comments.length === 0 && (
+                      <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                        No comments yet
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }; 

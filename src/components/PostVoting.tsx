@@ -1,5 +1,4 @@
 import React from 'react';
-import { HStack, IconButton, Text } from '@chakra-ui/react';
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { useStore } from '../store/useStore';
 import { useApiCall } from '../hooks/useApiCall';
@@ -49,26 +48,32 @@ export const PostVoting: React.FC<PostVotingProps> = ({
   };
 
   return (
-    <HStack spacing={2}>
-      <IconButton
+    <div className="flex items-center space-x-2">
+      <button
         aria-label="Upvote"
-        icon={<FaArrowUp />}
-        size="sm"
-        colorScheme={userVote === 1 ? 'blue' : 'gray'}
+        className={`p-2 rounded-md transition-colors ${
+          userVote === 1 
+            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400' 
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+        } ${!user || isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         onClick={handleUpvote}
-        isLoading={isLoading}
-        isDisabled={!user}
-      />
-      <Text fontWeight="medium">{score}</Text>
-      <IconButton
+        disabled={!user || isLoading}
+      >
+        <FaArrowUp className="w-4 h-4" />
+      </button>
+      <span className="font-medium text-gray-900 dark:text-gray-100">{score}</span>
+      <button
         aria-label="Downvote"
-        icon={<FaArrowDown />}
-        size="sm"
-        colorScheme={userVote === -1 ? 'red' : 'gray'}
+        className={`p-2 rounded-md transition-colors ${
+          userVote === -1 
+            ? 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400' 
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+        } ${!user || isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         onClick={handleDownvote}
-        isLoading={isLoading}
-        isDisabled={!user}
-      />
-    </HStack>
+        disabled={!user || isLoading}
+      >
+        <FaArrowDown className="w-4 h-4" />
+      </button>
+    </div>
   );
 }; 

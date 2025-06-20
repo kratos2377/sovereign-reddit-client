@@ -1,15 +1,4 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  FormControl,
-  FormLabel,
-  Textarea,
-  VStack,
-  Text,
-  Heading,
-  Divider,
-} from '@chakra-ui/react';
 import { useStore } from '../store/useStore';
 import { LoadingModal } from './LoadingModal';
 import { useApiCall } from '../hooks/useApiCall';
@@ -58,57 +47,64 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ post_sov_id }) =
   };
 
   return (
-    <Box mt={8}>
-      <Heading size="md" mb={4}>
+    <div className="mt-8">
+      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
         Comments
-      </Heading>
+      </h2>
 
       {user && (
-        <Box as="form" onSubmit={handleSubmit} mb={6}>
-          <FormControl>
-            <FormLabel>Add a comment</FormLabel>
-            <Textarea
+        <form onSubmit={handleSubmit} className="mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Add a comment
+            </label>
+            <textarea
               value={commentContent}
               onChange={(e) => setCommentContent(e.target.value)}
               placeholder="Write your comment here..."
               rows={3}
-              mb={2}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 mb-2 resize-none"
             />
-            <Button
+            <button
               type="submit"
-              colorScheme="blue"
-              isLoading={isSubmitting}
-              loadingText="Posting..."
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
             >
-              Post Comment
-            </Button>
-          </FormControl>
-        </Box>
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Posting...
+                </div>
+              ) : (
+                'Post Comment'
+              )}
+            </button>
+          </div>
+        </form>
       )}
 
       {isLoading ? (
         <LoadingModal isOpen={true} message="Loading comments..." />
       ) : (
-        <VStack spacing={4} align="stretch">
+        <div className="space-y-4">
           {comments.map((comment) => (
-            <Box
+            <div
               key={comment.id}
-              p={4}
-              borderWidth={1}
-              borderRadius="md"
-              boxShadow="sm"
+              className="p-4 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800"
             >
-              <Text>{comment.content}</Text>
-              <Text fontSize="sm" color="gray.500" mt={2}>
+              <p className="text-gray-900 dark:text-gray-100">{comment.content}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 Posted by {comment.user_sov_id} • {comment.score} points
-              </Text>
-            </Box>
+              </p>
+            </div>
           ))}
           {comments.length === 0 && (
-            <Text color="gray.500">No comments yet. Be the first to comment!</Text>
+            <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+              No comments yet. Be the first to comment!
+            </p>
           )}
-        </VStack>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }; 

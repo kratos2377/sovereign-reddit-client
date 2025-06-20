@@ -2,26 +2,24 @@
 
 import { useState, useEffect } from 'react'
 import { FaUser, FaComment, FaArrowUp, FaCommentAlt } from 'react-icons/fa'
-import { useStore } from '@/store/useStore'
+import { Post, useStore , Comment} from '@/store/useStore'
 import { LoadingModal } from '@/components/LoadingModal'
 import { useRouter } from 'next/navigation'
-
-interface Comment {
-  id: string
-  content: string
-  postId: string
-  postTitle: string
-  createdAt: string
-}
+import { apiService } from '@/services/api'
 
 export default function ProfilePage() {
-  const { user, posts, comments, getUserPosts, getUserComments } = useStore()
+  const { user } = useStore()
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts')
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
+
+      console.log("profile user is")
+      console.log(user)
       if (!user) {
         setIsLoading(false)
         return
@@ -30,9 +28,11 @@ export default function ProfilePage() {
       setIsLoading(true)
       try {
         if (activeTab === 'posts') {
-          await getUserPosts(user.sov_id)
+          const posts = await apiService.getUserPosts({user_sov_id: user.sov_id})
+          setPosts([...posts.posts])
         } else {
-          await getUserComments(user.sov_id)
+          const comments = await apiService.getUserComments({user_sov_id: user.sov_id})
+          setComments([...comments.comments])
         }
       } catch (error) {
         console.error('Error fetching user data:', error)
@@ -42,7 +42,7 @@ export default function ProfilePage() {
     }
 
     fetchUserData()
-  }, [user, activeTab, getUserPosts, getUserComments])
+  }, [user, activeTab])
 
   const handleTabChange = (tab: 'posts' | 'comments') => {
     setActiveTab(tab)
@@ -142,7 +142,6 @@ export default function ProfilePage() {
                         clipRule="evenodd"
                       />
                     </svg>
-                    {post.comments} comments
                   </span>
                   <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                 </div>

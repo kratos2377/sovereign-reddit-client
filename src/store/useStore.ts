@@ -10,11 +10,12 @@ export interface Post {
   post_sov_id: string
   title: string
   content: string
+  flair: string,
+  sub_sov_id: string,
   user_sov_id: string 
   upvotes: number
   downvotes: number
   score: number
-  comments: number
   createdAt: string
   updatedAt: string
 }
@@ -52,6 +53,7 @@ export interface UserJoinedSubs {
   id: string,
   user_sov_id: string,
   sub_sov_id: string,
+  subname: string,
   created_at: string,
   updated_at: string,
 }

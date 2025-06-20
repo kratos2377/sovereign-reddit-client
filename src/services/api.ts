@@ -44,7 +44,7 @@ export interface PostCommentsParams {
 }
 
 export interface SearchSubredditsByNameParams {
-  name: string;
+  query: string;
 }
 
 export const apiService = {

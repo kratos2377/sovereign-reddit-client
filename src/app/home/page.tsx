@@ -1,19 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useStore } from '@/store/useStore'
+import { Post, useStore } from '@/store/useStore'
 import { getAccessToken, usePrivy, useSolanaWallets } from "@privy-io/react-auth";
 import { BasicSigner } from '@/services/signer';
 import { chainHash } from '@/services/sovereign-api';
 import { LoadingModal } from '@/components/LoadingModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { apiService } from '@/services/api';
 
 export default function HomePage() {
-  const { posts, getUserFeed, user } = useStore()
+  const { user } = useStore()
   const [isLoading, setIsLoading] = useState(true);
   const { wallets } = useSolanaWallets();
   const router = useRouter();
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchUserFeed = async () => {
@@ -27,7 +29,12 @@ export default function HomePage() {
         const signer = await BasicSigner.fromPrivateKeyBytes(Uint8Array.from(wallets[0].address), chainHash);
         const bs58Key = await signer.getBs58Key();
         
-        await getUserFeed(bs58Key);
+        const feed =await apiService.getUserFeed({user_sov_id: bs58Key});
+
+        console.log("feed is")
+        console.log(feed)
+        setPosts([...feed.feed_posts])
+
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching user feed:", error);
@@ -36,7 +43,7 @@ export default function HomePage() {
     };
 
     fetchUserFeed();
-  }, [getUserFeed, wallets]);
+  }, [wallets]);
 
   const handlePostClick = (postId: string) => {
     router.push(`/home/post/${postId}`);
@@ -91,7 +98,6 @@ export default function HomePage() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  {post.comments} Comments
                 </button>
               </div>
             </div>

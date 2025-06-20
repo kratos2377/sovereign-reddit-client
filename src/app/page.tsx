@@ -93,9 +93,7 @@ export default function Home() {
           username: user.data.models[0].username
         });
 
-        setTimeout(() => {
-          router.replace("/home");
-        } , 200)
+        router.replace("/home");
       } else {
         setShowUsernameForm(true);
         setUser(null);
@@ -190,7 +188,7 @@ export default function Home() {
   
 
   return  (
-    <main className="flex flex-rowmin-h-screen min-w-full">
+    <main className="flex min-h-screen min-w-full">
       {/* Left: SVG and App Title */}
       <div className="w-1/2 flex flex-col items-center justify-center bg-indigo-600 p-8">
         <svg

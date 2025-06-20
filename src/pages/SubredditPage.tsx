@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  Container,
-  Heading,
-  Text,
-  VStack,
-  useDisclosure,
-  HStack,
-} from '@chakra-ui/react';
 import { useStore } from '../store/useStore';
 import { CreatePost } from '../components/CreatePost';
 import { CommentSection } from '../components/CommentSection';
@@ -19,7 +9,7 @@ import { useApiCall } from '../hooks/useApiCall';
 
 export const SubredditPage: React.FC = () => {
   const { sub_sov_id } = useParams<{ sub_sov_id: string }>();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const { user, posts, getSubredditPosts } = useStore();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,60 +30,73 @@ export const SubredditPage: React.FC = () => {
     fetchPosts();
   }, [sub_sov_id]);
 
+  const openCreatePost = () => setIsCreatePostOpen(true);
+  const closeCreatePost = () => setIsCreatePostOpen(false);
+
   if (!sub_sov_id) {
-    return <Text>Subreddit not found</Text>;
+    return (
+      <div className="max-w-6xl mx-auto py-8 px-4">
+        <p className="text-gray-700 dark:text-gray-300">Subreddit not found</p>
+      </div>
+    );
   }
 
   return (
-    <Container maxW="container.lg" py={8}>
-      <VStack spacing={8} align="stretch">
-        <Box>
-          <Heading mb={4}>Subreddit Posts</Heading>
+    <div className="max-w-6xl mx-auto py-8 px-4">
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Subreddit Posts
+          </h1>
           {user && (
-            <Button colorScheme="blue" onClick={onOpen}>
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
+              onClick={openCreatePost}
+            >
               Create Post
-            </Button>
+            </button>
           )}
-        </Box>
+        </div>
 
         {isLoading ? (
           <LoadingModal isOpen={true} message="Loading posts..." />
         ) : (
-          <VStack spacing={4} align="stretch">
+          <div className="space-y-4">
             {posts.map((post) => (
-              <Box
+              <div
                 key={post.post_sov_id}
-                p={4}
-                borderWidth={1}
-                borderRadius="md"
-                boxShadow="sm"
+                className="p-4 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800"
               >
-                <HStack justify="space-between" align="start" mb={2}>
-                  <Heading size="md">{post.title}</Heading>
+                <div className="flex justify-between items-start mb-2">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    {post.title}
+                  </h2>
                   <PostVoting
                     post_sov_id={post.post_sov_id}
                     score={post.score}
                   />
-                </HStack>
-                <Text mb={4}>{post.content}</Text>
-                <Text fontSize="sm" color="gray.500">
-                  Posted by {post.user_sov_id} • {post.comments} comments
-                </Text>
+                </div>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">{post.content}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Posted by {post.user_sov_id}  comments
+                </p>
                 <CommentSection post_sov_id={post.post_sov_id} />
-              </Box>
+              </div>
             ))}
             {posts.length === 0 && (
-              <Text color="gray.500">No posts yet. Be the first to post!</Text>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                No posts yet. Be the first to post!
+              </p>
             )}
-          </VStack>
+          </div>
         )}
-      </VStack>
+      </div>
 
       <CreatePost
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isCreatePostOpen}
+        onClose={closeCreatePost}
         sub_sov_id={sub_sov_id}
       />
-    </Container>
+    </div>
   );
 }; 

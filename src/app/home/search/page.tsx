@@ -4,13 +4,9 @@ import { useState } from 'react'
 import { FaSearch } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
 import { apiService } from '@/services/api'
+import { Subreddit } from '@/store/useStore'
 
-interface Subreddit {
-  id: string
-  name: string
-  members: number
-  description: string
-}
+
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -24,9 +20,13 @@ export default function SearchPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiService.searchSubredditsByName({ name: searchQuery });
+      const res = await apiService.searchSubredditsByName({ query: searchQuery });
       // Assume response is an array of subreddits with id, name, members, description
-      setSearchResults(res.data.models || []);
+
+      console.log("SEARCH RESULTS")
+      console.log(res)
+
+      setSearchResults([...res.subreddits]);
     } catch (err) {
       setError('Failed to search subreddits.');
     } finally {
@@ -35,7 +35,7 @@ export default function SearchPage() {
   }
 
   const handleSubredditClick = (subredditId: string) => {
-    router.push(`/home/sub/${subredditId}/page`);
+    router.push(`/home/sub/${subredditId}`);
   };
 
   return (
@@ -66,17 +66,15 @@ export default function SearchPage() {
       <div className="space-y-4">
         {searchResults.map((subreddit) => (
           <div
-            key={subreddit.id}
+            key={subreddit.sub_sov_id}
             className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => handleSubredditClick(subreddit.id)}
+            onClick={() => handleSubredditClick(subreddit.sub_sov_id)}
           >
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xl font-semibold">{subreddit.name}</h2>
-              <span className="text-sm text-gray-500">
-                {subreddit.members?.toLocaleString?.() ?? 0} members
-              </span>
+              <h2 className="text-xl font-semibold">{subreddit.subname}</h2>
+      
             </div>
-            <p className="text-gray-600">{subreddit.description}</p>
+            <p className="text-gray-600">{subreddit.sub_description.substring(0 , 20)}...</p>
           </div>
         ))}
       </div>

@@ -162,7 +162,6 @@ export default function PostPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-                {post.comments} Comments
               </span>
             </div>
           </div>

@@ -40,7 +40,7 @@ export default function Sidebar() {
     { href: '/home/profile', label: 'Profile', icon: FaUser },
     { href: '/home/create', label: 'Create Post', icon: FaPlus },
     { href: '/home/create-subreddit', label: 'Create Subreddit', icon: FaPlus },
-    ...(isAuthenticated ? [{ href: '/profile', label: 'Profile', icon: FaUser }] : []),
+  
   ]
 
   return (

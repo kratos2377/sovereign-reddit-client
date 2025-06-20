@@ -2,27 +2,72 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
+import { BasicSigner } from '@/services/signer'
+import { useSolanaWallets } from '@privy-io/react-auth'
+import { chainHash, getCreateSubredditTransaction, submitTransactionToRollup } from '@/services/sovereign-api'
 
 export default function CreateSubredditPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [subtitle, setSubtitle] = useState('')
   const [subdescription, setSubdescription] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-
+const {wallets} = useSolanaWallets()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
-    setSuccess(false)
+    if (!wallets || wallets.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Connect your wallet first.",
+      })
+      return;
+    }
+
+    if (subtitle.length < 4) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Subtitle must be at least 4 characters long.",
+      })
+      return;
+    }
+
+    if (subdescription.length < 10) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Subdescription must be at least 10 characters long.",
+      })
+      return;
+    }
+
     try {
       // TODO: Call API to create subreddit
       // await apiService.createSubreddit({ subtitle, subdescription })
-      setSuccess(true)
-      setTimeout(() => router.push('/home'), 1000)
+      setIsSubmitting(true)
+      const signer = await BasicSigner.fromPrivateKeyBytes(Uint8Array.from(wallets[0].address) , chainHash)
+      const subreddit_create_transaction = await getCreateSubredditTransaction(subtitle , subdescription , await signer.getBs58Key());
+    
+    await submitTransactionToRollup(subreddit_create_transaction, signer)
+    
+      toast({
+        variant: "success",
+        title: "Success!",
+        description: "Subreddit created successfully!",
+      })
+      
+      // Navigate to home after a short delay to show the toast
+      setTimeout(() => {
+        router.push('/home')
+      }, 1000)
     } catch {
-      setError('Failed to create subreddit.')
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create subreddit. Please try again.",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -60,8 +105,6 @@ export default function CreateSubredditPage() {
             placeholder="Describe your subreddit"
           />
         </div>
-        {error && <div className="text-red-500 text-sm">{error}</div>}
-        {success && <div className="text-green-600 text-sm">Subreddit created! Redirecting...</div>}
         <div className="flex justify-end">
           <button
             type="submit"

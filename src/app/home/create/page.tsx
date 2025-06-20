@@ -2,53 +2,106 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useStore } from '@/store/useStore'
+import { Subreddit, UserJoinedSubs, useStore } from '@/store/useStore'
+import { useToast } from '@/hooks/use-toast'
+import { apiService } from '@/services/api'
+import { useSolanaWallets } from '@privy-io/react-auth'
+import { chainHash, getCreatePostTransaction, submitTransactionToRollup } from '@/services/sovereign-api'
+import { BasicSigner } from '@/services/signer'
 
 export default function CreatePostPage() {
   const router = useRouter()
-  const { setPosts, posts, user, userSubs, fetchUserSubs } = useStore()
+  const { toast } = useToast()
+  const { setPosts, posts, user } = useStore()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedSub, setSelectedSub] = useState('')
   const [subsLoading, setSubsLoading] = useState(false)
-
+  const [userSubs, setUserSubs] = useState<UserJoinedSubs[]>([])
+  const {wallets} = useSolanaWallets()
   useEffect(() => {
     const fetchSubs = async () => {
       if (user && user.sov_id) {
         setSubsLoading(true)
-        await fetchUserSubs(user.sov_id)
-        setSubsLoading(false)
+        try {
+          const res = await apiService.getUserSubs(user.sov_id)
+
+          console.log("USER SUBS")
+          console.log(res)
+
+          setUserSubs([...res.user_subs])
+        } catch {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load subreddits. Please try again.",
+          })
+        } finally {
+          setSubsLoading(false)
+        }
       }
     }
     fetchSubs()
-  }, [user, fetchUserSubs])
+  }, [user, toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
+
+    if (!wallets || wallets.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Connect your wallet first.",
+      })
+      return;
+    }
+
+    if (title.length < 10) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Subtitle must be at least 10 characters long.",
+      })
+      return;
+    }
+
+    if (content.length < 5) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Subdescription must be at least 5 characters long.",
+      })
+      return;
+    }
+
 
     try {
       // Here you would typically make an API call to create the post
       // For now, we'll just add it to the local state
-      const newPost = {
-        post_sov_id: Date.now().toString(),
-        title,
-        content,
-        user_sov_id: user?.sov_id || '',
-        upvotes: 0,
-        downvotes: 0,
-        score: 0,
-        comments: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        sub_sov_id: selectedSub,
-      }
-
-      setPosts([newPost, ...posts])
-      router.push('/home')
+      const signer = await BasicSigner.fromPrivateKeyBytes(Uint8Array.from(wallets[0].address) , chainHash)
+      const subreddit_create_transaction = await getCreatePostTransaction(content , "" , selectedSub , title);
+    
+      await submitTransactionToRollup(subreddit_create_transaction, signer)
+      
+   
+      toast({
+        variant: "success",
+        title: "Success!",
+        description: "Your post has been created successfully.",
+      })
+      
+      // Navigate to home after a short delay to show the toast
+      setTimeout(() => {
+        router.push('/home')
+      }, 1000)
     } catch (error) {
       console.error('Error creating post:', error)
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -77,7 +130,7 @@ export default function CreatePostPage() {
               </option>
               {userSubs.map((sub) => (
                 <option key={sub.sub_sov_id} value={sub.sub_sov_id}>
-                  {sub.sub_sov_id}
+                  {sub.subname}
                 </option>
               ))}
             </select>

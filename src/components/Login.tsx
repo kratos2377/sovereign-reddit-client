@@ -71,7 +71,7 @@ export default function Login() {
   return (
     <main className="flex min-h-screen min-w-full">
       {/* Left: SVG and App Title */}
-      <div className="w-1/2 flex flex-col items-center justify-center bg-indigo-600 p-8">
+      <div className="w-1/2 h-full flex flex-col items-center justify-center bg-indigo-600 p-8">
         <svg
           className="w-64 h-64 mb-8"
           viewBox="0 0 400 300"
@@ -94,7 +94,7 @@ export default function Login() {
           {!walletChecked && !showUsernameForm && (
             <div className="flex flex-col items-center">
               <button
-                className="bg-violet-600 hover:bg-violet-700 py-3 px-6 text-white rounded-lg text-lg font-semibold shadow"
+                className="bg-violet-600 hover:bg-violet-700 py-3 px-6 text-white rounded-lg text-lg font-semibold shadow transition-colors"
                 onClick={handlePrivyLogin}
                 disabled={loading}
               >
@@ -104,8 +104,8 @@ export default function Login() {
             </div>
           )}
           {showUsernameForm && (
-            <form onSubmit={handleRegister} className="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-md">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+            <form onSubmit={handleRegister} className="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 Choose a Username
               </label>
               <input
@@ -113,14 +113,15 @@ export default function Login() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-3"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:ring-indigo-400 transition-colors"
+                placeholder="Enter your username"
                 required
               />
               {error && <div className="text-red-500 text-sm">{error}</div>}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors dark:bg-indigo-700 dark:hover:bg-indigo-800"
               >
                 {loading ? "Registering..." : "Register"}
               </button>
